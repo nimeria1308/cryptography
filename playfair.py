@@ -2,21 +2,21 @@ from textwrap import wrap
 
 
 def playfair_get_character(coords, key):
-    # get the line. instead of mod 5,
-    # use line count to keep it generic
-    line = key[coords[1] % len(key)]
+    # get the row. instead of mod 5,
+    # use row count to keep it generic
+    row = key[coords[1] % len(key)]
 
     # same here, but return the character
-    character = line[coords[0] % len(line)]
+    character = row[coords[0] % len(row)]
 
     return character
 
 
 def playfair_get_coordinates(character, key):
-    for y, line in enumerate(key):
-        if character in line:
+    for y, row in enumerate(key):
+        if character in row:
             # found y, find x
-            x = line.find(character)
+            x = row.find(character)
             return x, y
 
 
@@ -27,8 +27,8 @@ def playfair_get_pair(input_pair, key, encode):
     if a == b:
         raise Exception("Characters must differ")
 
-    # move down the column/line if encoding
-    # move up the column/line if decoding
+    # move down the column/row if encoding
+    # move up the column/row if decoding
     # rectangle rule is the same in both cases
     x = 1 if encode else -1
 
@@ -42,12 +42,11 @@ def playfair_get_pair(input_pair, key, encode):
         c = (a[0], a[1] + x)
         d = (b[0], b[1] + x)
     elif a[1] == b[1]:
-        # return characters down the line
+        # return characters down the row
         c = (a[0] + x, a[1])
         d = (b[0] + x, b[1])
     else:
         # use rectangle rule
-        # RW -> US
         c = (b[0], a[1])
         d = (a[0], b[1])
 
