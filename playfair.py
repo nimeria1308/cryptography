@@ -80,8 +80,66 @@ KEY = (
     "AXFHC",
 )
 
-p = "CRYPTOGRAPHY"
+# p = "CRYPTOGRAPHY"
 # p = "RWSUXBTL"
-c = playfair(p, KEY, True)
+# c = playfair(p, KEY, True)
+# p2 = playfair(c, KEY, False)
+# print("%s -> %s -> %s" % (p, c, p2))
+
+def print_pairs_info():
+    pairs = list(zip(wrap(p, 2), wrap(c, 2)))
+
+    # find pairs on the same column/row
+    same = {}
+    for p1, p2 in pairs:
+        if p1[0] in p2 or p1[1] in p2:
+            # find repeating character
+            r = p1[0] if (p1[0] == p2[0] or p1[0] == p2[1]) else p1[1]
+            same[p1] = r
+
+    for p1, p2 in pairs:
+        prefix = "  "
+        if p1 in same:
+            prefix = "XX"
+        else:
+            for _, r in same.items():
+                if r in p1:
+                    prefix = "??"
+
+        print("%s %s -> %s" % (prefix, p1, p2))
+
+
+KEY = [
+    "NTWZE",
+    "__U_B",
+    "A_FOS",
+    "DGHIR",
+    "____C",
+]
+
+p = "THEWINTEROFOURDISCONTENT"
+c = "WGNZDZWNISOSBHGRREAZWNTW"
+c2 = playfair(p, KEY, True)
+print("<%s>" % c2)
+for p_, c1_, c2_ in zip(wrap(p, 2), wrap(c, 2), wrap(c2, 2)):
+    suffix = "OK" if c1_ == c2_ else ""
+    print("%s -> %s/%s %s" % (p_, c1_, c2_, suffix))
+
 p2 = playfair(c, KEY, False)
 print("%s -> %s -> %s" % (p, c, p2))
+
+ppp = "EBQXZLHDLKIVQGOMALEBVBDOSGSFZRANDAMOLBSEELSOZLKDCOZFGSIN"
+print(playfair(ppp, KEY, False))
+
+# __ TH -> WG
+#    EW -> NZ
+#    IN -> DZ
+# __ TE -> WN
+# __ RO -> IS
+# XX FO -> OS FOS
+#    UR -> BH
+#    DI -> GR
+#    SC -> RE
+# __ ON -> AZ
+# __ TE -> WN
+# XX NT -> TW NTW
