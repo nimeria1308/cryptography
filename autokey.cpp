@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cstdlib>
+#include <string.h>
 
 using namespace std;
 
@@ -40,6 +41,40 @@ static inline void autokey(
     }
 }
 
+template <size_t key_size, size_t text_size>
+static inline void find_key_(
+    char *key, size_t key_index,
+    const char *cipher_text, const char *needle)
+{
+    if (key_index < key_size)
+    {
+        for (char c = 'A'; c <= 'Z'; c++)
+        {
+            key[key_index] = c;
+            find_key_<key_size, text_size>(
+                key, key_index + 1, cipher_text, needle);
+        }
+    }
+    else
+    {
+        // key filled, try if it matches
+        char decoded[text_size + 1] = {0};
+        autokey<key_size, text_size, false>(key, cipher_text, decoded);
+        if (strstr(decoded, needle))
+        {
+            cout << "Found: " << key << " -> " << decoded << endl;
+        }
+    }
+}
+
+template <size_t key_size, size_t text_size>
+static inline void find_key(
+    const char *cipher_text, const char *needle)
+{
+    char key[key_size + 1] = {0};
+    find_key_<key_size, text_size>(key, 0, cipher_text, needle);
+}
+
 int main()
 {
     constexpr size_t text_size = 21;
@@ -59,6 +94,12 @@ int main()
     // decode
     autokey<key_size, text_size, false>(key, cipher_text, plain_text_reconstructed);
     cout << cipher_text << " -> " << plain_text_reconstructed << endl;
+
+    // look for keys in example
+    find_key<3, 21>("FHCIHXWOYAVJKPKYBKVNW", "PATH");
+
+    // look for keys in test
+    find_key<6, 31>("GXILBGLQQJAIPWBMRKAZBWYKKKUCRKG", "GESTURE");
 
     return 0;
 }
