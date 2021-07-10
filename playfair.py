@@ -1,4 +1,6 @@
+from itertools import permutations
 from textwrap import wrap
+from tqdm import tqdm
 
 
 def playfair_get_character(coords, key):
@@ -36,6 +38,9 @@ def playfair_get_pair(input_pair, key, encode):
     a = playfair_get_coordinates(a, key)
     b = playfair_get_coordinates(b, key)
 
+    if not a or not b:
+        return "??"
+
     # same column
     if a[0] == b[0]:
         # return characters down the column
@@ -72,74 +77,37 @@ def playfair(plain_text, key, encode):
     return "".join(cypher_text)
 
 
-KEY = (
-    "OGETN",
-    "MQVBK",
-    "DWZSY",
-    "PULRI",
-    "AXFHC",
-)
+def playfair_try_decript(crypt_text, key):
+    # create a list of all letters
+    letters = [chr(x) for x in range(ord('A'), ord('Z') + 1) if x != ord('J')]
+    key_letters = "".join(key)
 
-# p = "CRYPTOGRAPHY"
-# p = "RWSUXBTL"
-# c = playfair(p, KEY, True)
-# p2 = playfair(c, KEY, False)
-# print("%s -> %s -> %s" % (p, c, p2))
+    missing_letters = [x for x in letters if x not in key_letters]
 
-def print_pairs_info():
-    pairs = list(zip(wrap(p, 2), wrap(c, 2)))
+    all_permutations = list(permutations(missing_letters))
+    results = {}
 
-    # find pairs on the same column/row
-    same = {}
-    for p1, p2 in pairs:
-        if p1[0] in p2 or p1[1] in p2:
-            # find repeating character
-            r = p1[0] if (p1[0] == p2[0] or p1[0] == p2[1]) else p1[1]
-            same[p1] = r
+    for p in tqdm(all_permutations):
+        new_key = "".join(KEY)
+        for l in p:
+            new_key = new_key.replace('_', l, 1)
+        new_key = wrap(new_key, 5)
 
-    for p1, p2 in pairs:
-        prefix = "  "
-        if p1 in same:
-            prefix = "XX"
-        else:
-            for _, r in same.items():
-                if r in p1:
-                    prefix = "??"
+        decrypted = playfair(crypt_text, new_key, False)
+        if "CRYPTOGRAPHY" in decrypted:
+            results["".join(new_key)] = decrypted
 
-        print("%s %s -> %s" % (prefix, p1, p2))
+    return results
 
 
 KEY = [
     "NTWZE",
-    "__U_B",
     "A_FOS",
     "DGHIR",
+    "__U_B",
     "____C",
 ]
 
-p = "THEWINTEROFOURDISCONTENT"
-c = "WGNZDZWNISOSBHGRREAZWNTW"
-c2 = playfair(p, KEY, True)
-print("<%s>" % c2)
-for p_, c1_, c2_ in zip(wrap(p, 2), wrap(c, 2), wrap(c2, 2)):
-    suffix = "OK" if c1_ == c2_ else ""
-    print("%s -> %s/%s %s" % (p_, c1_, c2_, suffix))
-
-p2 = playfair(c, KEY, False)
-print("%s -> %s -> %s" % (p, c, p2))
-
-ppp = "EBQXZLHDLKIVQGOMALEBVBDOSGSFZRANDAMOLBSEELSOZLKDCOZFGSIN"
-print(playfair(ppp, KEY, False))
-
-# __ TH -> WG
-#    EW -> NZ
-#    IN -> DZ
-# __ TE -> WN
-# __ RO -> IS
-# XX FO -> OS FOS
-#    UR -> BH
-#    DI -> GR
-#    SC -> RE
-# __ ON -> AZ
-# __ TE -> WN
-# XX NT -> TW NTW
+c = "EBQXZLHDLKIVQGOMALEBVBDOSGSFZRANDAMOLBSEELSOZLKDCOZFGSIN"
+res = playfair_try_decript(c, KEY)
+print(res)
