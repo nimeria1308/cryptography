@@ -19,7 +19,7 @@ def playfair_best_sequence(pairs):
         c = pairs[p]
         if (p[0] in c) or (p[1] in c):
             # add to result
-            result[p] = (c, 4)
+            result[p] = (c, 100)
 
             # add to found chars
             for x in (p + c):
@@ -38,10 +38,9 @@ def playfair_best_sequence(pairs):
                 pp.remove(p)
                 continue
 
-            c = pairs[p]
-
             # compute score
             # how many of the chars are already fixed
+            c = pairs[p]
             score = sum([1 if x in chars else 0 for x in (p + c)])
 
             # found new candidate
@@ -54,7 +53,6 @@ def playfair_best_sequence(pairs):
             # add to result
             best_pair_c = pairs[best_pair]
             result[best_pair] = (best_pair_c, best_score)
-            # print("Found %s -> %s score: %d competitors: %d" % (best_pair, best_pair_c, best_score, competitors))
 
             # add to found chars
             for x in (best_pair + best_pair_c):
@@ -66,11 +64,11 @@ def playfair_best_sequence(pairs):
     return result
 
 
-s = playfair_generate_pairs(
+pairs = playfair_generate_pairs(
     "THEWINTEROFOURDISCONTENT", "WGNZDZWNISOSBHGRREAZWNTW")
 
-bs = playfair_best_sequence(s)
+best_seq = playfair_best_sequence(pairs)
 
 # print pairs
-for p, c in bs.items():
+for p, c in best_seq.items():
     print("%s %s %d" % (p, c[0], c[1]))
