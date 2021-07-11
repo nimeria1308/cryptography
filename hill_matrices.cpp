@@ -17,6 +17,7 @@ static inline bool check_params(
 
 int main()
 {
+    size_t count = 0;
     for (unsigned int a = 0; a < 26; a++)
     {
         for (unsigned int b = 0; b < 26; b++)
@@ -27,17 +28,14 @@ int main()
                 {
                     if (check_params(a, b, c, d))
                     {
-                        cout
-                            << "a=" << a
-                            << " b=" << b
-                            << " c=" << c
-                            << " d=" << d
-                            << endl;
+                        count++;
                     }
                 }
             }
         }
     }
+
+    cout << "count: " << count << endl;
 
     return 0;
 }
