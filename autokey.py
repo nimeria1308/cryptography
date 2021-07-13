@@ -1,3 +1,6 @@
+from string import ascii_uppercase
+from itertools import product
+
 A_POS = ord("A")
 
 
@@ -39,6 +42,21 @@ def autokey(key, input_text, encode):
     return "".join(output)
 
 
+def find_key(cipher_text, needle, key_size):
+    results = {}
+
+    # quick check -> "DKWNSGLAUBE"
+    for key in product(ascii_uppercase, repeat=key_size):
+        # key filled, decode it
+        decoded = autokey(key, cipher_text, False)
+
+        # check if needle is in the decoded
+        if needle in decoded:
+            results["".join(key)] = decoded
+
+    return results
+
+
 key = "MAY"
 plain_text = "THEPATHOFTHERIGHTEOUS"
 cipher_text = autokey(key, plain_text, True)
@@ -47,3 +65,8 @@ plain_text_reconstructed = autokey(key, cipher_text, False)
 print("%s -> %s -> %s" % (plain_text, cipher_text, plain_text_reconstructed))
 
 print(autokey("GLAUBE", "GXILBGLQQJAIPWBMRKAZBWYKKKUCRKG", False))
+
+results = find_key("GXILBGLQQJAIPWBMRKAZBWYKKKUCRKG", "GESTURE", 6)
+
+for key, decoded in results.items():
+    print("%s: %s" % (key, decoded))
