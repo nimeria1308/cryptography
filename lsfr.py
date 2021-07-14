@@ -15,16 +15,17 @@ def lsfr_next(coeffs, current):
 def _find_period(coeffs, starter):
     max_period = 2 ** len(coeffs)
 
-    t = 0
+    period = 0
     current = starter
-    while t < max_period:
-        t += 1
+
+    # get data of size max_period * 2
+    for _ in range(max_period * 2 -1):
         current = lsfr_next(coeffs, current)
         if current == starter:
-            print("%s <> %s -> %d" % (coeffs, starter, t))
-            return t
+            break
+        period += 1
 
-    return 0
+    return period
 
 def find_period(coeffs):
     periods = set()
@@ -34,22 +35,40 @@ def find_period(coeffs):
         if any(starter):
             periods.add(_find_period(coeffs, starter))
 
-    print(periods)
     return periods.pop() if (len(periods) == 1) else 0
 
-def make_lsfr(period, all_results=True):
-    results = []
-    lsfr_length = ceil(log2(period))
+def make_lsfr(period):
+    results = {}
+    lsfr_length = ceil(log2(period)) + 1
 
+    # try all coeffients
     for coeffs in product((0, 1), repeat=lsfr_length):
-        new_period = find_period(coeffs)
-        print("%s -> %d" % (coeffs, new_period))
-        if new_period == period:
-            results.append(coeffs)
-        if not all_results:
-            break
+        # skip (0,0,0, ...) ceoffs
+        if any(coeffs):
+            new_period = find_period(coeffs)
+            if new_period:
+                results[coeffs] = new_period
 
     return results
 
-# print(find_period((1, 1, 0, 0)))
-print(make_lsfr(21))
+def print_coeffs(coeffs):
+    for c in coeffs:
+        print(coeffs)
+        max_period = 2 ** len(c)
+        starter = (1,) + ((0,) * (len(c) - 1))
+        data = [starter]
+        current = starter
+
+        # get data of size max_period * 2
+        for _ in range(max_period * 2 -1):
+            current = lsfr_next(c, current)
+            data.append(current)
+
+        for i in range(max_period):
+            print("%s %s" % (data[i], data[i+(max_period - 1)]))
+
+        print("")
+
+coeffs = make_lsfr(21)
+print(coeffs)
+# print_coeffs(coeffs)
