@@ -39,10 +39,9 @@ def find_period(taps, start_value, size):
     return t
 
 
-def print_periods(size):
+def find_taps_with_period(size):
     max_value = (1 << size) - 1
-
-    print("Periods for %d taps" % size)
+    results = {}
 
     for taps in range(1, max_value + 1):
         found_period = True
@@ -58,8 +57,31 @@ def print_periods(size):
             found_period = False
 
         if found_period:
-            print("taps: %s period: %s" % (bin(taps)[2:], period))
+            results[taps] = period
+
+    return results
 
 
-for p in range(1, 8):
-    print_periods(p)
+def print_lsfr(taps, start_value, size):
+    current = start_value
+    period = find_period(taps, start_value, size)
+    fmt = "period={:d} taps={:0%db}" % size
+    print(fmt.format(period, taps))
+
+    print("t  S")
+    fmt = "{:2d} {:0%db}" % size
+    for t in range(period + 1):
+        print(fmt.format(t, current))
+        current = lsfr(taps, current, size)
+    print("")
+
+
+taps = find_taps_with_period(6)
+for tap, period in taps.items():
+    print("taps={:06b} period={}".format(tap, period))
+
+taps_21 = [tap for tap, period in taps.items() if period == 21]
+
+for tap in taps_21:
+    print("taps={:06b}".format(tap))
+    print_lsfr(tap, 1, 6)
